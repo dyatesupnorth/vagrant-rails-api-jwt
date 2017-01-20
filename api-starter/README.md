@@ -1,24 +1,23 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Assuming you have the vagrant box up and running:
 
-Things you may want to cover:
+Run the usual stuff:
 
-* Ruby version
+```
+$: bundle install
+$: db:migrate
+```
 
-* System dependencies
+After that create a user:
+```
+$: rails c
+> User.create("email": "test@test.com", "password" : "secure_pass", "password_confirmation": "secure_pass")
+```
+Then run the server, for some reason we have to bind it to 0.0.0.0 'cos we're running inside a Vagrant Box. I'll fix it later:
+```
+rails s -b 0.0.0.0
+```
+Then open another console and test the routes from there using Curl. this project uses JWT so first send a POST request with the user credentials to '/authentication'
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Then add the token to future requests. Simples.
