@@ -1,61 +1,45 @@
-#Credit to fxn @ https://github.com/rails/rails-dev-box/blob/master/bootstrap.sh
+sudo apt-get update
+sudo apt-get install git -y
+sudo /usr/sbin/update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+# postgres
+echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main " | sudo tee -a /etc/apt/sources.list.d/pgdg.list
+sudo wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install -y postgresql-9.3 libpq-dev
+echo '# "local" is for Unix domain socket connections only
+local   all             all                                  trust
+# IPv4 local connections:
+host    all             all             0.0.0.0/0            trust
+# IPv6 local connections:
+host    all             all             ::/0                 trust' | sudo tee /etc/postgresql/9.3/main/pg_hba.conf
+sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /etc/postgresql/9.3/main/postgresql.conf
+sudo /etc/init.d/postgresql restart
+sudo su - postgres -c 'createuser -s vagrant'
+sudo mkdir -p /usr/local/pgsql/data
+sudo chown postgres:postgres /usr/local/pgsql/data
 
-# The output of all these installation steps is noisy. With this utility
-# the progress report is nice and concise.
-function install {
-  echo installing $1
-  shift
-  apt-get -y install "$@" >/dev/null 2>&1
-}
+sudo -u postgres /usr/lib/postgresql/9.1/bin/initdb -D /usr/local/pgsql/data
+sudo -u postgres -c 'createuser -s vagrant'
 
-echo adding swap file
-fallocate -l 2G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+psql -U postgres -c "ALTER ROLE vagrant CREATEDB"
 
-echo updating package information
-apt-add-repository -y ppa:brightbox/ruby-ng >/dev/null 2>&1
-apt-get -y update >/dev/null 2>&1
+echo 'creating db'
 
-install 'development tools' build-essential
+createdb sample_db
 
-install Ruby ruby2.3 ruby2.3-dev
-update-alternatives --set ruby /usr/bin/ruby2.3 >/dev/null 2>&1
-update-alternatives --set gem /usr/bin/gem2.3 >/dev/null 2>&1
 
-echo installing Bundler
-gem install bundler -N >/dev/null 2>&1
-install rails
-install Git git
-install SQLite sqlite3 libsqlite3-dev
-install memcached memcached
-install Redis redis-server
-install RabbitMQ rabbitmq-server
 
-install PostgreSQL postgresql postgresql-contrib libpq-dev
-sudo -u postgres createuser --superuser ubuntu
-sudo -u postgres createdb -O ubuntu activerecord_unittest
-sudo -u postgres createdb -O ubuntu activerecord_unittest2
+sudo apt-get install curl -y
+curl -sSL https://get.rvm.io | bash
 
-debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
-debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
-install MySQL mysql-server libmysqlclient-dev
-mysql -uroot -proot <<SQL
-CREATE USER 'rails'@'localhost';
-CREATE DATABASE activerecord_unittest  DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-CREATE DATABASE activerecord_unittest2 DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-GRANT ALL PRIVILEGES ON activerecord_unittest.* to 'rails'@'localhost';
-GRANT ALL PRIVILEGES ON activerecord_unittest2.* to 'rails'@'localhost';
-GRANT ALL PRIVILEGES ON inexistent_activerecord_unittest.* to 'rails'@'localhost';
-SQL
 
-install 'Nokogiri dependencies' libxml2 libxml2-dev libxslt1-dev
-install 'Blade dependencies' libncurses5-dev
-install 'ExecJS runtime' nodejs
+source /home/vagrant/.rvm/scripts/rvm
+echo 'which rvm'
+which rvm
 
-# Needed for docs generation.
-update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8
+rvm install 2.3
+gem install bundler
+sudo apt-get install nodejs
 
-echo 'all set, rock on!'
+
+echo 'All Done. Postgres needs setting up , refer to https://github.com/dyatesupnorth/vagrant-rails-api-jwt'

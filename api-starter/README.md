@@ -4,9 +4,15 @@ Assuming you have the vagrant box up and running:
 
 Run the usual stuff:
 
+
 ```
-$: bundle install
+cd /vagrant/api-starter/
+```
+
+```
+$: bundle 
 $: db:migrate
+$: db:seed
 ```
 
 After that create a user:
@@ -20,4 +26,9 @@ rails s -b 0.0.0.0
 ```
 Then open another console and test the routes from there using Curl. this project uses JWT so first send a POST request with the user credentials to '/authentication'
 
+```
+curl -H "Content-Type: application/json" -X POST -d
+'{"email":"test@test.com","password":"security"}'
+http://localhost:3000/authenticate
+```
 Then add the token to future requests. Simples.
