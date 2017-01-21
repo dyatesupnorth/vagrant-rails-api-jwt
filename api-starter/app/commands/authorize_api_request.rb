@@ -1,7 +1,7 @@
-class AuthorizeApiRequest
   prepend SimpleCommand
   def initialize(headers = {})
     @headers = headers
+class AuthorizeApiRequest
   end
 
   def call
