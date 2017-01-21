@@ -27,7 +27,7 @@ update-alternatives --set gem /usr/bin/gem2.3 >/dev/null 2>&1
 
 echo installing Bundler
 gem install bundler -N >/dev/null 2>&1
-
+install rails
 install Git git
 install SQLite sqlite3 libsqlite3-dev
 install memcached memcached
