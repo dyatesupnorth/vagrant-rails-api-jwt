@@ -32,3 +32,7 @@ curl -H "Content-Type: application/json" -X POST -d
 http://localhost:3000/authenticate
 ```
 Then add the token to future requests. Simples.
+
+```
+curl -H "Authorization: <auth_token>" http://localhost:3000/items
+```
